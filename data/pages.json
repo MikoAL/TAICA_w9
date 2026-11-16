@@ -1,0 +1,418 @@
+[
+  {
+    "id": "relation",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch2",
+    "title": "relation（關聯）",
+    "prerequisites": [],
+    "summary": "relation、tuple、attribute，以及 schema 和 instance 的差別。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "superkey",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch2",
+    "title": "superkey（超鍵）",
+    "prerequisites": [
+      "relation"
+    ],
+    "summary": "一組在每個 legal instance 裡都能唯一指出一個 tuple 的 attribute。",
+    "source": null,
+    "status": "published"
+  },
+  {
+    "id": "candidate-key",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch2",
+    "title": "candidate key（候選鍵）",
+    "prerequisites": [
+      "superkey"
+    ],
+    "summary": "拿掉任何一個 attribute 就不再是 superkey 的最小 superkey。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "primary-key",
+    "type": "concept",
+    "form": "short",
+    "chapter": "ch2",
+    "title": "primary key（主鍵）",
+    "prerequisites": [
+      "candidate-key"
+    ],
+    "summary": "設計者從 candidate key 中選出、交給 DBMS 強制執行的那一個。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "foreign-key",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch2",
+    "title": "foreign key（外鍵）",
+    "prerequisites": [
+      "primary-key"
+    ],
+    "summary": "一個 relation 的值必須出現在另一個 relation 的 primary key 裡。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "relational-algebra",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch2",
+    "title": "relational algebra（關聯代數）",
+    "prerequisites": [
+      "relation"
+    ],
+    "summary": "select、project、Cartesian product 與 join，把 relation 變成新的 relation。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "create-table",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch3",
+    "title": "create table 與 domain type",
+    "prerequisites": [
+      "relation"
+    ],
+    "summary": "SQL 的資料型別、create table 裡的 integrity constraint，以及 insert、delete、drop、alter。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "select-from-where",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch3",
+    "title": "select-from-where 基本查詢",
+    "prerequisites": [
+      "relational-algebra"
+    ],
+    "summary": "SQL 查詢的基本結構，以及它對應到哪些 relational algebra 運算。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "rename-and-string-operations",
+    "type": "concept",
+    "form": "short",
+    "chapter": "ch3",
+    "title": "as 改名、like 字串比對與 order by",
+    "prerequisites": [
+      "select-from-where"
+    ],
+    "summary": "用 as 改名（包括 self join）、用 like 比對字串、用 order by 排序。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "null-values",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch3",
+    "title": "null value（空值）",
+    "prerequisites": [
+      "select-from-where"
+    ],
+    "summary": "表示未知或不存在的值，以及運算和比較遇到 null 時得到的 unknown。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "set-operations",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch3",
+    "title": "set operation（集合運算）",
+    "prerequisites": [
+      "select-from-where"
+    ],
+    "summary": "union、intersect、except，以及保留重複的 all 版本。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "aggregate-functions",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch3",
+    "title": "aggregate function（聚合函數）",
+    "prerequisites": [
+      "select-from-where"
+    ],
+    "summary": "count、sum、avg 等聚合函數，以及搭配 group by 分組計算。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "subquery-in-from-clause",
+    "type": "concept",
+    "form": "short",
+    "chapter": "ch3",
+    "title": "from 子句裡的 subquery",
+    "prerequisites": [
+      "aggregate-functions"
+    ],
+    "summary": "把一個查詢的結果當成 relation，放進 from 子句再查一次。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "outer-join",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch4",
+    "title": "outer join（外部合併）",
+    "prerequisites": [
+      "select-from-where"
+    ],
+    "summary": "保留找不到配對的 tuple，用 null 補齊。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "natural-join-vs-inner-join",
+    "type": "concept",
+    "form": "short",
+    "chapter": "ch4",
+    "title": "natural join 與 inner join 的差別",
+    "prerequisites": [
+      "outer-join"
+    ],
+    "summary": "自動比對同名 attribute，和自己寫 on 條件的差別。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "transaction",
+    "type": "concept",
+    "form": "short",
+    "chapter": "ch4",
+    "title": "transaction（交易）",
+    "prerequisites": [
+      "select-from-where"
+    ],
+    "summary": "一串要嘛全部完成、要嘛全部取消的更新，以及 commit 與 rollback。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "integrity-constraint",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch4",
+    "title": "integrity constraint（完整性限制）",
+    "prerequisites": [
+      "foreign-key"
+    ],
+    "summary": "not null、unique、check 與 referential integrity。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "entity-relationship-model",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch6",
+    "title": "E-R model（實體關係模型）",
+    "prerequisites": [
+      "relation"
+    ],
+    "summary": "用 entity set、relationship set 與 attribute 描述現實世界。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "complex-attributes",
+    "type": "concept",
+    "form": "short",
+    "chapter": "ch6",
+    "title": "composite、multivalued 與 derived attribute",
+    "prerequisites": [
+      "entity-relationship-model"
+    ],
+    "summary": "可以再拆開、可以有多個值、可以算出來的 attribute，以及它們在 E-R diagram 裡的畫法。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "mapping-cardinality",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch6",
+    "title": "mapping cardinality（對應基數）",
+    "prerequisites": [
+      "entity-relationship-model"
+    ],
+    "summary": "一對一、一對多、多對多，以及 participation。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "primary-key-for-relationship-sets",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch6",
+    "title": "relationship set 的 primary key",
+    "prerequisites": [
+      "mapping-cardinality",
+      "primary-key"
+    ],
+    "summary": "mapping cardinality 決定 relationship set 的 primary key 該怎麼選。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "reduction-to-relation-schemas",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch6",
+    "title": "E-R diagram 轉換成 relation schema",
+    "prerequisites": [
+      "primary-key-for-relationship-sets",
+      "foreign-key"
+    ],
+    "summary": "entity set、composite 與 multivalued attribute、relationship set 各自變成什麼樣的 relation schema，以及哪些 schema 是多餘的。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "functional-dependency",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch7",
+    "title": "functional dependency（函數相依）",
+    "prerequisites": [
+      "superkey"
+    ],
+    "summary": "「左邊相同，右邊就一定相同」的規則，以及 satisfy 與 holds 的差別。",
+    "source": null,
+    "status": "published"
+  },
+  {
+    "id": "trivial-functional-dependency",
+    "type": "concept",
+    "form": "short",
+    "chapter": "ch7",
+    "title": "trivial functional dependency（平凡函數相依）",
+    "prerequisites": [
+      "functional-dependency"
+    ],
+    "summary": "右邊是左邊子集，所以在任何 relation 都成立的 functional dependency。",
+    "source": null,
+    "status": "published"
+  },
+  {
+    "id": "practice-functional-dependency-1",
+    "type": "problem",
+    "chapter": "ch7",
+    "title": "練習：從 instance 判斷 functional dependency",
+    "prerequisites": [
+      "functional-dependency"
+    ],
+    "summary": "給一個 instance，判斷哪些 functional dependency 被 satisfy，又能不能說它 holds。",
+    "source": "原創練習題",
+    "status": "published"
+  },
+  {
+    "id": "armstrongs-axioms",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch7",
+    "title": "Armstrong's axioms（Armstrong 公理）",
+    "prerequisites": [
+      "functional-dependency"
+    ],
+    "summary": "從已知的 functional dependency 推出新的 functional dependency 的規則。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "attribute-closure",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch7",
+    "title": "attribute closure（屬性閉包）",
+    "prerequisites": [
+      "armstrongs-axioms"
+    ],
+    "summary": "一組 attribute 能決定的所有 attribute；用來判斷 superkey。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "canonical-cover",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch7",
+    "title": "canonical cover（標準覆蓋）",
+    "prerequisites": [
+      "attribute-closure"
+    ],
+    "summary": "去掉多餘部分、但意義不變的最精簡 functional dependency 集合。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "lossless-decomposition",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch7",
+    "title": "lossless decomposition（無損分解）",
+    "prerequisites": [
+      "attribute-closure"
+    ],
+    "summary": "拆開的表再 join 回來，不多也不少。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "dependency-preservation",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch7",
+    "title": "dependency preservation（相依保持）",
+    "prerequisites": [
+      "lossless-decomposition"
+    ],
+    "summary": "拆表之後，不必 join 就能檢查每條 functional dependency。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "bcnf",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch7",
+    "title": "BCNF（Boyce-Codd 正規形式）",
+    "prerequisites": [
+      "lossless-decomposition"
+    ],
+    "summary": "每條非 trivial 的 functional dependency，左邊都是 superkey。",
+    "source": null,
+    "status": "planned"
+  },
+  {
+    "id": "third-normal-form",
+    "type": "concept",
+    "form": "full",
+    "chapter": "ch7",
+    "title": "third normal form（第三正規形式）",
+    "prerequisites": [
+      "bcnf",
+      "dependency-preservation"
+    ],
+    "summary": "為了保住 dependency preservation，比 BCNF 放寬一點的正規形式。",
+    "source": null,
+    "status": "planned"
+  }
+]

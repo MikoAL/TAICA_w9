@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>trivial functional dependency（平凡函數相依） · 資料庫系統 考前講義</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body data-page-id="trivial-functional-dependency">
+  <header class="top-bar"></header>
+  <div class="shell">
+    <aside class="sidebar" aria-label="目錄"></aside>
+    <main>
+      <h1>trivial functional dependency（平凡函數相依）</h1>
+
+      <section class="step" id="motivate">
+        <h2>動機</h2>
+        <p>想把 orders(order_no, shop, shop_phone, item) 上 holds 的 functional dependency 全部列出來，馬上會冒出一大堆像 <span class="math">{shop, item} → shop</span> 這樣的規則。它們永遠成立，卻沒告訴我們任何關於店家或訂單的事。</p>
+        <p>這種規則需要一個名字，才能在列清單、判斷正規化時把它們挑出來放一邊。</p>
+      </section>
+
+      <section class="step" id="build-up">
+        <h2>從已知出發</h2>
+        <aside class="refresh">
+          <span class="refresh-label">先複習：satisfy</span>
+          <p>instance r satisfy <span class="math">α → β</span>，是指 r 裡任兩個 tuple 若在 α 上相同，就在 β 上相同。（<a href="functional-dependency.html">functional dependency 頁</a>）</p>
+        </aside>
+        <p>假設 β 的每個 attribute 都在 α 裡。兩個 tuple 在 α 上相同，意思是在 α 的<em>每一個</em> attribute 上都相同，其中當然包括 β 的那些 attribute。</p>
+        <p>所以「右邊相同」是「左邊相同」直接附帶的結果，不需要任何現實規則幫忙。任何 relation 的任何 instance 都 satisfy 它，因此它在每個 schema 上都 holds。</p>
+      </section>
+
+      <section class="step" id="definition">
+        <h2>正式定義</h2>
+        <h3>trivial functional dependency</h3>
+        <p>若 β ⊆ α，則 <span class="math">α → β</span> 是 <dfn id="term-trivial-functional-dependency">trivial functional dependency（平凡函數相依）</dfn>。判斷只看 attribute 的名字，不看任何資料。</p>
+        <h3>nontrivial functional dependency</h3>
+        <p>β 只要有一個 attribute 不在 α 裡，<span class="math">α → β</span> 就是 <dfn id="term-nontrivial-functional-dependency">nontrivial functional dependency（非平凡函數相依）</dfn>，也就是 β ⊄ α。</p>
+      </section>
+
+      <section class="step" id="examples">
+        <h2>例子</h2>
+        <div class="example">
+          <p class="example-label">例 1：同一個左邊，一條 trivial、一條不是</p>
+          <p>在 ticket(venue, seat, show_date, holder) 上：</p>
+          <ul>
+            <li><span class="math">{venue, seat} → venue</span> 是 trivial：{venue} ⊆ {venue, seat}。</li>
+            <li><span class="math">{venue, seat} → {seat, show_date}</span> 不是 trivial，雖然右邊的 seat 也出現在左邊。show_date 不在左邊，所以 β ⊄ α。</li>
+          </ul>
+          <p>第二條要判斷它 holds 與否，就得回到現實規則；第一條不用。</p>
+        </div>
+      </section>
+
+      <section class="step" id="exam-note">
+        <h2>考試提醒</h2>
+        <p>題目要求「列出 nontrivial functional dependency」時，右邊只要有一個 attribute 不在左邊就要留下，左右有重疊不代表 trivial。</p>
+      </section>
+
+      <section class="step" id="check">
+        <h2>自我檢測</h2>
+        <p>R(A, B, C)。下列哪些是 trivial functional dependency？</p>
+        <ol>
+          <li><span class="math">A → A</span></li>
+          <li><span class="math">{A, B} → {B, C}</span></li>
+          <li><span class="math">A → ∅</span></li>
+        </ol>
+        <details class="answer">
+          <summary>看答案</summary>
+          <ol>
+            <li>trivial：{A} ⊆ {A}。左右完全相同是 β ⊆ α 最簡單的情況。</li>
+            <li>不是：C ∉ {A, B}。</li>
+            <li>trivial：空集合是任何集合的子集。兩個 tuple 在 ∅ 上的值一定相同，所以它永遠被 satisfy。</li>
+          </ol>
+          <p>最容易錯的是第 2 題，看到 B 重疊就判成 trivial。避免的方法是逐一檢查右邊每個 attribute 是否都在左邊。</p>
+        </details>
+      </section>
+
+      <nav class="pager"></nav>
+    </main>
+  </div>
+  <footer class="site-footer">說明與例子皆為原創；<a href="../CLAUDE.md">撰寫規則</a></footer>
+</body>
+</html>

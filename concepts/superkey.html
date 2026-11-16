@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>superkey（超鍵） · 資料庫系統 考前講義</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body data-page-id="superkey">
+  <header class="top-bar"></header>
+  <div class="shell">
+    <aside class="sidebar" aria-label="目錄"></aside>
+    <main>
+      <h1>superkey（超鍵）</h1>
+
+      <section class="step" id="motivate">
+        <h2>動機</h2>
+        <p>一間健身房把會員存在一個 relation 裡：會員編號、姓名、電話、方案。櫃台要把「林雅婷」的方案改成年繳，於是寫「把姓名是林雅婷的那一列改掉」。</p>
+        <div class="table-wrap">
+          <table class="relation">
+            <caption>member(member_no, name, phone, plan)</caption>
+            <thead><tr><th scope="col"></th><th scope="col">member_no</th><th scope="col">name</th><th scope="col">phone</th><th scope="col">plan</th></tr></thead>
+            <tbody>
+              <tr class="hl"><th scope="row">t₁</th><td>M001</td><td>林雅婷</td><td>0912-000-101</td><td>月繳</td></tr>
+              <tr><th scope="row">t₂</th><td>M002</td><td>陳柏翰</td><td>0912-000-202</td><td>年繳</td></tr>
+              <tr class="hl"><th scope="row">t₃</th><td>M003</td><td>林雅婷</td><td>0912-000-303</td><td>季繳</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>結果 t₁ 和 t₃ 兩列都被改了：剛好有兩位會員都叫林雅婷。用姓名找人，就是在賭「不會有人同名」。</p>
+        <p>我們需要一組 attribute，保證看到它的值就只會對到一列。而且這個保證不能只對今天的資料成立：明天新加入的會員，也不能讓它失效。</p>
+      </section>
+
+      <section class="step" id="build-up">
+        <h2>從已知出發</h2>
+        <aside class="refresh">
+          <span class="refresh-label">先複習：relation</span>
+          <p>relation 是 tuple 的<strong>集合</strong>，每個 tuple 在每個 attribute 上有一個值。relation schema 是名字加上 attribute 清單，像 member(member_no, name, phone, plan)；instance 是某個時刻實際存著的那些 tuple。（relation 頁規劃中）</p>
+        </aside>
+        <p>因為 relation 是集合，同一個 tuple 不會出現兩次。所以任兩個不同的 tuple，至少在一個 attribute 上不同：把<em>全部</em> attribute 一起看，一定分得出任兩個 tuple。</p>
+        <p>這個「分辨能力」就是動機裡缺的東西。問題只剩下：能不能只看<em>一部分</em> attribute，就保留這個能力？</p>
+        <p>為了講清楚「一部分」，先約定一個寫法：K 是一組 attribute，<span class="math">t[K]</span> 表示 tuple t 在 K 裡那些 attribute 上的值。例如 <span class="math">t₁[{name, plan}] = (林雅婷, 月繳)</span>。</p>
+        <p>對應關係是：全部 attribute 的集合 R 永遠有分辨能力；superkey 就是任何一個仍然保有這個能力的子集 K ⊆ R。</p>
+      </section>
+
+      <section class="step" id="definition">
+        <h2>正式定義</h2>
+        <h3>legal instance</h3>
+        <p>白話地說，legal instance 是「遵守所有現實規則的那些資料」：不只今天存著的這一份，而是規則允許出現的任何一份。</p>
+        <p>一個 <dfn id="term-legal-instance">legal instance（合法實例）</dfn> 是滿足 R 所有現實世界限制的 instance r(R)。</p>
+        <h3>superkey</h3>
+        <p>設 R 是一個 relation schema，K ⊆ R。若對 R 的<strong>每一個</strong> legal instance <span class="reminder">（遵守現實規則的任何一份資料）</span> r，r 裡任兩個不同的 tuple 在 K 上的值都不同，就稱 K 是 R 的 <dfn id="term-superkey">superkey（超鍵）</dfn>：</p>
+        <p class="math">對每個 legal instance r：t₁, t₂ ∈ r 且 t₁ ≠ t₂ ⇒ t₁[K] ≠ t₂[K]</p>
+        <p>注意判斷的對象是 schema 加上現實規則，不是某一份 instance。一份 instance 只能證明 K <em>不是</em> superkey（找到兩個不同的 tuple 在 K 上相同），永遠不能證明 K <em>是</em> superkey。</p>
+      </section>
+
+      <section class="step" id="examples">
+        <h2>例子</h2>
+        <div class="example">
+          <p class="example-label">例 1：全部 attribute 一定是 superkey</p>
+          <p>在動機的 member 裡，K = {member_no, name, phone, plan} 是 superkey。理由跟資料無關：relation 是集合，兩個不同的 tuple 不可能在所有 attribute 上都相同。任何 relation schema 都至少有這一個 superkey。</p>
+        </div>
+        <div class="example">
+          <p class="example-label">例 2：一個 attribute 就夠，加了也還是</p>
+          <p>健身房的規則是「每位會員拿到一個不重複的會員編號」，所以 {member_no} 是 member 的 superkey。</p>
+          <p>{member_no, plan} 也是 superkey：兩個 tuple 若在 member_no 上已經不同，多看一個 plan 也還是不同。superkey 加上任何 attribute 仍然是 superkey，所以 superkey 不必是「最小」的。</p>
+        </div>
+        <div class="example">
+          <p class="example-label">例 3：每個 attribute 都會重複，要三個一起看</p>
+          <p>共享空間的會議室借用表，規則是「同一間會議室、同一天、同一個時段，只借給一個社團」。</p>
+          <div class="table-wrap">
+            <table class="relation">
+              <caption>booking(room, day, period, club)</caption>
+              <thead><tr><th scope="col"></th><th scope="col">room</th><th scope="col">day</th><th scope="col">period</th><th scope="col">club</th></tr></thead>
+              <tbody>
+                <tr class="hl"><th scope="row">t₁</th><td>A</td><td>11/20</td><td>上午</td><td>讀書會</td></tr>
+                <tr><th scope="row">t₂</th><td>A</td><td>11/20</td><td>下午</td><td>桌遊社</td></tr>
+                <tr><th scope="row">t₃</th><td>B</td><td>11/20</td><td>上午</td><td>讀書會</td></tr>
+                <tr class="hl"><th scope="row">t₄</th><td>A</td><td>11/21</td><td>上午</td><td>吉他社</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>四個 attribute 各自都有重複的值。room、day、period 三個裡任取兩個，這份資料也已經刷掉了：t₁ 和 t₂ 在 {room, day} 上相同，t₁ 和 t₃ 在 {day, period} 上相同，不相鄰的 t₁ 和 t₄ 兩列在 {room, period} 上相同。</p>
+          <p>{room, day, period} 是 superkey，理由來自規則，不是來自這四列資料：規則禁止兩列在這三個 attribute 上都相同。</p>
+        </div>
+        <div class="example">
+          <p class="example-label">非例：這份 instance 裡沒有重複，{name} 卻不是 superkey</p>
+          <div class="table-wrap">
+            <table class="relation">
+              <caption>member(member_no, name, phone, plan)</caption>
+              <thead><tr><th scope="col"></th><th scope="col">member_no</th><th scope="col">name</th><th scope="col">phone</th><th scope="col">plan</th></tr></thead>
+              <tbody>
+                <tr><th scope="row">t₁</th><td>M010</td><td>張志明</td><td>0912-000-404</td><td>月繳</td></tr>
+                <tr><th scope="row">t₂</th><td>M011</td><td>吳佩珊</td><td>0912-000-505</td><td>年繳</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>兩列的 name 不同，所以<em>這一份</em> instance 裡 name 能分辨每一列。但健身房沒有「不准同名」的規則，有兩位同名會員的 instance（像動機那份）也是 legal instance。不成立的條件是「對<strong>每一個</strong> legal instance」。</p>
+        </div>
+        <div class="example">
+          <p class="example-label">例 4（邊界）：空的 instance，以及最多只有一列的 relation</p>
+          <div class="table-wrap">
+            <table class="relation">
+              <caption>member(member_no, name, phone, plan)</caption>
+              <thead><tr><th scope="col"></th><th scope="col">member_no</th><th scope="col">name</th><th scope="col">phone</th><th scope="col">plan</th></tr></thead>
+              <tbody>
+                <tr><td class="empty" colspan="5">（沒有任何 tuple）</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>空的 instance 裡找不到兩個不同的 tuple，所以任何 K，甚至空集合 ∅，都「沒有重複」。這正是定義要看每一個 legal instance 的原因：只看一份資料，什麼都證明不了。</p>
+          <p>反過來，有些 relation 依規則就最多只有一列，例如只存一組系統設定的 settings(site_name, max_members)。這時連 ∅ 都是 superkey：任兩個 tuple 在 ∅ 上的值一定相同（都是空的），而規則保證根本不會有兩個不同的 tuple。</p>
+        </div>
+      </section>
+
+      <section class="step" id="summary">
+        <h2>重點整理</h2>
+        <dl class="summary">
+          <div><dt>問題 Problem</dt><dd>更新或刪除資料時要能精確指出一個 tuple，而且以後新增的資料也不能讓這個方法失效。</dd></div>
+          <div><dt>核心 Key idea</dt><dd>superkey 是一組 attribute，在每個 legal instance 裡，不同的 tuple 在它上面的值都不同。</dd></div>
+          <div><dt>來自 Built from</dt><dd>relation 是 tuple 的集合，所以把全部 attribute 一起看，一定分得出任兩個 tuple。</dd></div>
+          <div><dt>差別 Difference</dt><dd>superkey 只用一部分 attribute 就保住這個分辨能力，而且必須對每個 legal instance 成立，不只眼前這一份。</dd></div>
+        </dl>
+      </section>
+
+      <section class="step" id="exam-link">
+        <h2>考試怎麼考</h2>
+        <p>最常見的題型是給一個 relation schema 和幾條現實規則，問哪些 attribute 集合是 superkey。superkey 也是 candidate key（最小的 superkey，規劃中頁面）和 primary key（規劃中頁面）的起點。<span class="basis course">課程依據：Ch.2</span></p>
+        <p>到了正規化，判斷 superkey 改用 <a href="functional-dependency.html">functional dependency</a>（「左邊相同，右邊就相同」的規則）和 attribute closure（從一組 attribute 推出它能決定的所有 attribute，規劃中頁面）。<span class="basis course">課程依據：Ch.7</span></p>
+        <p>最常錯的一步是看著題目給的 instance 說「這欄沒有重複，所以是 superkey」。instance 只能用來否定；肯定一定要回到規則。<span class="basis general">一般經驗</span></p>
+        <p>第二常錯的是以為 superkey 必須最小。最小的那種另有名字，叫 candidate key。<span class="basis general">一般經驗</span></p>
+      </section>
+
+      <section class="step" id="check">
+        <h2>自我檢測</h2>
+        <p>共享單車的租借紀錄，每一列代表一次租借，start_time 精確到分鐘。規則：一台車在同一個時間點最多只會開始一次租借；很多台車可以在同一分鐘、從同一個站被借走。</p>
+        <div class="table-wrap">
+          <table class="relation">
+            <caption>rental(bike_id, station, start_time, card_no)</caption>
+            <thead><tr><th scope="col"></th><th scope="col">bike_id</th><th scope="col">station</th><th scope="col">start_time</th><th scope="col">card_no</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">t₁</th><td>B17</td><td>河濱站</td><td>11/20 08:02</td><td>C-3301</td></tr>
+              <tr><th scope="row">t₂</th><td>B42</td><td>車站前</td><td>11/20 08:02</td><td>C-5120</td></tr>
+              <tr><th scope="row">t₃</th><td>B17</td><td>公園站</td><td>11/20 18:45</td><td>C-3301</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ol>
+          <li>{bike_id, start_time} 是 rental 的 superkey 嗎？</li>
+          <li>這份 instance 裡 station 三列都不同。{station} 是 superkey 嗎？</li>
+          <li>{bike_id, start_time, station} 是 superkey 嗎？</li>
+        </ol>
+        <details class="answer">
+          <summary>看答案</summary>
+          <ol>
+            <li>是。規則保證同一台車不會在同一個時間點開始兩次租借，所以任何 legal instance 裡，兩個不同的 tuple 不可能在 bike_id 和 start_time 上都相同。</li>
+            <li>不是。規則明說很多台車可以從同一個站被借走，所以存在兩列 station 相同的 legal instance。這份 instance 剛好沒重複，不代表什麼。</li>
+            <li>是。它包含第 1 題的 superkey，superkey 加上任何 attribute 仍然是 superkey。</li>
+          </ol>
+          <p>最容易錯的是第 2 題：被眼前的資料說服。避免的方法是每次都問「規則有沒有禁止兩列在 K 上相同？」，沒有禁止就不是 superkey。</p>
+        </details>
+      </section>
+
+      <nav class="pager"></nav>
+    </main>
+  </div>
+  <footer class="site-footer">說明與例子皆為原創；<a href="../CLAUDE.md">撰寫規則</a></footer>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>練習：從 instance 判斷 functional dependency · 資料庫系統 考前講義</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body data-page-id="practice-functional-dependency-1">
+  <header class="top-bar"></header>
+  <div class="shell">
+    <aside class="sidebar" aria-label="目錄"></aside>
+    <main>
+      <h1>練習：從 instance 判斷 functional dependency</h1>
+
+      <section class="step" id="problem">
+        <h2>題目</h2>
+        <p>外送平台的派送紀錄如下，每一列是一筆訂單。</p>
+        <div class="table-wrap">
+          <table class="relation">
+            <caption>delivery(order_no, rider, zone, fee)</caption>
+            <thead><tr><th scope="col"></th><th scope="col">order_no</th><th scope="col">rider</th><th scope="col">zone</th><th scope="col">fee</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">t₁</th><td>D101</td><td>阿傑</td><td>東區</td><td>40</td></tr>
+              <tr><th scope="row">t₂</th><td>D102</td><td>小芳</td><td>西區</td><td>55</td></tr>
+              <tr><th scope="row">t₃</th><td>D103</td><td>阿傑</td><td>西區</td><td>55</td></tr>
+              <tr><th scope="row">t₄</th><td>D104</td><td>小芳</td><td>西區</td><td>55</td></tr>
+              <tr><th scope="row">t₅</th><td>D105</td><td>阿明</td><td>南區</td><td>40</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ol>
+          <li>這份 instance satisfy 下列哪些 functional dependency？（a）<span class="math">zone → fee</span>（b）<span class="math">rider → zone</span>（c）<span class="math">{rider, zone} → fee</span>（d）<span class="math">fee → zone</span></li>
+          <li>平台規定「運費只依區域決定」。<span class="math">zone → fee</span> 在 delivery 上 holds 嗎？只根據這份 instance 能下這個結論嗎？</li>
+        </ol>
+        <p class="source">題目來源：原創練習題</p>
+      </section>
+
+      <section class="step" id="identify">
+        <h2>這題在考什麼</h2>
+        <p>考的是 <a href="../concepts/functional-dependency.html">functional dependency</a> 的 satisfy 與 holds。第 1 小題問「這份 instance satisfy 哪些」，是逐對檢查資料；第 2 小題問「holds 嗎」「只根據 instance 能不能下結論」，是在測你分不分得清這兩個詞。</p>
+      </section>
+
+      <section class="step" id="refresh">
+        <h2>先複習</h2>
+        <aside class="refresh">
+          <span class="refresh-label">先複習：satisfy 與 holds</span>
+          <p>instance r satisfy <span class="math">α → β</span>：r 裡任兩個 tuple 若在 α 上相同，就在 β 上相同。<span class="math">α → β</span> holds：每一個 legal instance（遵守現實規則的任何一份資料）都 satisfy 它。（<a href="../concepts/functional-dependency.html">functional dependency 頁</a>）</p>
+        </aside>
+      </section>
+
+      <section class="step" id="solve">
+        <h2>解題</h2>
+        <h3>方法：依左邊分組，只看有兩列以上的組</h3>
+        <p>要推翻 <span class="math">α → β</span>，需要一對在 α 上相同的 tuple。所以先把資料依 α 的值分組：只有一列的組不可能出問題，直接跳過。剩下的組裡，檢查 β 的值是否全部相同。</p>
+        <h3>（a）zone → fee：satisfy</h3>
+        <p>依 zone 分組：東區只有 t₁，南區只有 t₅，西區有 t₂、t₃、t₄。西區三列的 fee 都是 55，沒有反例。</p>
+        <h3>（b）rider → zone：不 satisfy</h3>
+        <p>阿傑出現在 t₁ 和 t₃，zone 分別是東區和西區。找到這一對就可以停了，不必再看小芳。</p>
+        <h3>（c）{rider, zone} → fee：satisfy</h3>
+        <p>這裡分組要看 rider 和 zone <em>兩個都相同</em>。t₁（阿傑, 東區）和 t₃（阿傑, 西區）不同組，因為 zone 不同；唯一有兩列的組是 t₂ 和 t₄（小芳, 西區），fee 都是 55。</p>
+        <p>其實可以不檢查：（a）已經 satisfy。在 {rider, zone} 上相同的兩列，在 zone 上一定也相同，所以 fee 也相同。左邊多加 attribute，要比的對只會變少。</p>
+        <h3>（d）fee → zone：不 satisfy</h3>
+        <p>方向反過來，分組改看 fee。fee = 40 的有 t₁（東區）和 t₅（南區），zone 不同。（a）satisfy 不代表反方向也 satisfy。</p>
+        <h3>第 2 小題：holds，但不是從 instance 看出來的</h3>
+        <p>平台規定運費只依區域決定，所以每一個 legal instance 裡，同區的兩筆訂單運費都相同：<span class="math">zone → fee</span> holds。</p>
+        <p>只根據這份 instance 則不能下結論。instance 沒有反例，只代表「到目前為止沒被推翻」。如果平台沒有這條規定，明天就可能出現一筆西區 60 元的訂單，那份資料一樣是 legal instance。</p>
+        <p>答案：第 1 小題 satisfy 的是（a）和（c）；（b）的反例是 t₁、t₃，（d）的反例是 t₁、t₅。第 2 小題 holds，理由是平台規定，不是這份資料。</p>
+      </section>
+
+      <section class="step" id="trap">
+        <h2>陷阱</h2>
+        <p>最常見的錯誤答案是第 2 小題寫「從表中可以看出 zone 相同時 fee 都相同，所以 holds」。這把 satisfy 當成了 holds：資料只能推翻規則，證明 holds 一定要靠現實規則。</p>
+        <p>第二個陷阱在（d）：看到（a）成立就順手把（d）也勾起來。functional dependency 有方向，反過來要重新檢查。</p>
+      </section>
+
+      <section class="step" id="check">
+        <h2>變化題</h2>
+        <p>把 t₄ 的 fee 從 55 改成 60，其他不變。第 1 小題（a）到（d）的答案哪些會改變？為什麼（a）和（c）會一起變？</p>
+        <details class="answer">
+          <summary>看答案</summary>
+          <p>（a）和（c）從 satisfy 變成不 satisfy；（b）和（d）原本就不 satisfy，反例 t₁、t₃ 和 t₁、t₅ 都沒動到。</p>
+          <ul>
+            <li>（a）zone → fee：西區的 t₂（55）和 t₄（60），t₃（55）和 t₄（60），都是反例。</li>
+            <li>（c）{rider, zone} → fee：t₂ 和 t₄ 都是（小芳, 西區），fee 是 55 和 60。</li>
+          </ul>
+          <p>一起變是因為 t₂、t₄ 這一對在 {rider, zone} 上相同，在 zone 上當然也相同，所以它同時推翻兩條。反過來不一定：t₃、t₄ 推翻（a），卻不推翻（c），因為它們的 rider 不同。</p>
+          <p>最容易錯的是以為（c）不受影響，因為「只有一列被改」。避免的方法是照分組法重做一次，不要沿用舊答案。</p>
+        </details>
+      </section>
+
+      <nav class="pager"></nav>
+    </main>
+  </div>
+  <footer class="site-footer">說明與例子皆為原創；<a href="../CLAUDE.md">撰寫規則</a></footer>
+</body>
+</html>

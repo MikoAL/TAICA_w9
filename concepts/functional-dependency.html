@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>functional dependency（函數相依） · 資料庫系統 考前講義</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body data-page-id="functional-dependency">
+  <header class="top-bar"></header>
+  <div class="shell">
+    <aside class="sidebar" aria-label="目錄"></aside>
+    <main>
+      <h1>functional dependency（函數相依）</h1>
+
+      <section class="step" id="motivate">
+        <h2>動機</h2>
+        <p>一個外送平台把訂單存成一個 relation，為了方便，每一列都順手存了店家電話。</p>
+        <div class="table-wrap">
+          <table class="relation">
+            <caption>orders(order_no, shop, shop_phone, item)</caption>
+            <thead><tr><th scope="col"></th><th scope="col">order_no</th><th scope="col">shop</th><th scope="col">shop_phone</th><th scope="col">item</th></tr></thead>
+            <tbody>
+              <tr class="hl"><th scope="row">t₁</th><td>A001</td><td>阿嬤豆花</td><td>02-5550-0199</td><td>花生豆花</td></tr>
+              <tr><th scope="row">t₂</th><td>A002</td><td>小林麵館</td><td>02-5550-0202</td><td>牛肉麵</td></tr>
+              <tr class="hl"><th scope="row">t₃</th><td>A003</td><td>阿嬤豆花</td><td>02-5550-0101</td><td>芋圓豆花</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>阿嬤豆花換了電話，工讀生只改到 t₁。現在 t₁ 和 t₃ 兩列對同一間店給出兩個不同的電話，沒人知道哪個是對的。</p>
+        <p>現實裡有一條規則：「同一間店只有一個電話」。這張表沒有任何東西擋住違反這條規則的資料。要檢查它、之後再用它重新設計這張表，第一步是把這種規則寫成精確的形式。</p>
+      </section>
+
+      <section class="step" id="build-up">
+        <h2>從已知出發</h2>
+        <aside class="refresh">
+          <span class="refresh-label">先複習：superkey</span>
+          <p><span class="math">t[K]</span> 是 tuple t 在 attribute 集合 K 上的值。K 是 R 的 superkey，意思是在每個 legal instance（遵守現實規則的任何一份資料）裡，兩個不同的 tuple 在 K 上的值都不同。（<a href="superkey.html">superkey 頁</a>）</p>
+        </aside>
+        <p>把 superkey 換個方向說：兩個 tuple 只要在 K 上相同，就是同一個 tuple。relation 是集合，所以「同一個 tuple」就等於「在 R 的每個 attribute 上都相同」。</p>
+        <p class="math">t₁[K] = t₂[K] ⇒ t₁[R] = t₂[R]</p>
+        <p>「同店同電話」也是這個形狀，只是右邊弱一點：兩列在 shop 上相同，只要求它們在 shop_phone 上相同，不要求整列相同（t₁ 和 t₃ 的 item 本來就該不同）。</p>
+        <p>所以只要把右邊的「整個 R」換成任意一組 attribute，就得到我們要的寫法。superkey 就是右邊剛好是整個 R 的特例。</p>
+      </section>
+
+      <section class="step" id="definition">
+        <h2>正式定義</h2>
+        <h3>functional dependency</h3>
+        <p>白話地說，functional dependency 是一條「只要左邊相同，右邊就一定相同」的規則。</p>
+        <p>設 R 是 relation schema，α ⊆ R、β ⊆ R。<dfn id="term-functional-dependency">functional dependency（函數相依）</dfn> <span class="math">α → β</span> 是關於 R 的一條規則：任兩個 tuple 若在 α 上的值相同，在 β 上的值也必須相同。讀作「α 決定 β」；α 叫左邊，β 叫右邊。只有一個 attribute 時常省略大括號，寫成 <span class="math">shop → shop_phone</span>。課本和考卷常縮寫為 FD；本站一律寫全名。</p>
+        <p>這條規則可以拿一份資料來檢查，也可以拿來描述所有合法資料。這兩件事要分開命名。</p>
+        <h3>satisfy</h3>
+        <p>一份 instance r(R) <dfn id="term-satisfy">satisfy（滿足）</dfn> <span class="math">α → β</span>，是指 r 裡的每一對 tuple 都遵守這條規則：</p>
+        <p class="math">對所有 t₁, t₂ ∈ r：t₁[α] = t₂[α] ⇒ t₁[β] = t₂[β]</p>
+        <p>只要找到一對 tuple 在 α 上相同、在 β 上不同，r 就不 satisfy 這條 functional dependency。</p>
+        <h3>holds</h3>
+        <p><span class="math">α → β</span> 在 R 上 <dfn id="term-holds">holds（成立）</dfn>，是指 R 的每一個 legal instance <span class="reminder">（遵守現實規則的任何一份資料）</span> 都 satisfy <span class="reminder">（每對 tuple 都遵守這條規則）</span> 它。</p>
+        <p>satisfy 是一份 instance 的性質，直接看資料就能檢查。holds 是 schema 加上現實規則的性質，只能從規則判斷：不 satisfy 就一定不 hold，但 satisfy 了不代表 hold。</p>
+        <p>用這個語言重寫 superkey：K 是 R 的 superkey，若且唯若 <span class="math">K → R</span> 在 R 上 holds。</p>
+      </section>
+
+      <section class="step" id="examples">
+        <h2>例子</h2>
+        <div class="example">
+          <p class="example-label">例 1：一個 attribute 決定一個 attribute</p>
+          <div class="table-wrap">
+            <table class="relation">
+              <caption>orders(order_no, shop, shop_phone, item)</caption>
+              <thead><tr><th scope="col"></th><th scope="col">order_no</th><th scope="col">shop</th><th scope="col">shop_phone</th><th scope="col">item</th></tr></thead>
+              <tbody>
+                <tr class="hl"><th scope="row">t₁</th><td>A001</td><td>阿嬤豆花</td><td>02-5550-0101</td><td>花生豆花</td></tr>
+                <tr><th scope="row">t₂</th><td>A002</td><td>小林麵館</td><td>02-5550-0202</td><td>牛肉麵</td></tr>
+                <tr class="hl"><th scope="row">t₃</th><td>A003</td><td>阿嬤豆花</td><td>02-5550-0101</td><td>芋圓豆花</td></tr>
+                <tr><th scope="row">t₄</th><td>A004</td><td>河堤咖哩</td><td>02-5550-0303</td><td>豬排咖哩</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>檢查 <span class="math">shop → shop_phone</span>：只有 t₁ 和 t₃ 兩列的 shop 相同，它們的 shop_phone 也相同，所以這份 instance satisfy 它。其他店都只出現一次，沒有東西要比。</p>
+          <p>它在 orders 上也 holds，但理由是現實規則「一間店只有一個電話」，不是這四列資料。</p>
+        </div>
+        <div class="example">
+          <p class="example-label">例 2：左邊兩個 attribute，一對相鄰的 tuple 就能推翻</p>
+          <p>售票系統的規則是「同一個場館、同一個座位、同一天，只賣給一個人」。</p>
+          <div class="table-wrap">
+            <table class="relation">
+              <caption>ticket(venue, seat, show_date, holder)</caption>
+              <thead><tr><th scope="col"></th><th scope="col">venue</th><th scope="col">seat</th><th scope="col">show_date</th><th scope="col">holder</th></tr></thead>
+              <tbody>
+                <tr class="hl"><th scope="row">t₁</th><td>星光館</td><td>A-12</td><td>12/24</td><td>周先生</td></tr>
+                <tr class="hl"><th scope="row">t₂</th><td>星光館</td><td>A-12</td><td>12/25</td><td>鄭小姐</td></tr>
+                <tr><th scope="row">t₃</th><td>河岸劇場</td><td>A-12</td><td>12/24</td><td>林小姐</td></tr>
+                <tr><th scope="row">t₄</th><td>星光館</td><td>B-03</td><td>12/24</td><td>周先生</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p><span class="math">{venue, seat} → holder</span>：t₁ 和 t₂ 兩列在 venue、seat 上都相同，holder 卻不同。一對就夠了：這份 instance 不 satisfy 它，所以它也不可能 hold。</p>
+          <p><span class="math">{venue, seat, show_date} → holder</span>：四列裡沒有任何兩列在這三個 attribute 上都相同，所以 satisfy。它 holds，理由是售票規則。</p>
+        </div>
+        <div class="example">
+          <p class="example-label">非例：右邊兩個 attribute，satisfy 了，卻不 hold</p>
+          <p>同一份 ticket instance，檢查 <span class="math">holder → {venue, show_date}</span>。holder 重複的只有周先生的 t₁ 和 t₄，兩列都是（星光館, 12/24），所以這份 instance satisfy 它。</p>
+          <p>但現實裡沒有規則禁止周先生另外買一張 12/25 河岸劇場的票，加上那一列的 instance 也是 legal instance，而且不 satisfy 這條規則。不成立的條件是「<strong>每一個</strong> legal instance 都 satisfy」，所以它不 hold。</p>
+        </div>
+        <div class="example">
+          <p class="example-label">例 3（邊界）：空的 instance 和只有一列的 instance</p>
+          <div class="table-wrap">
+            <table class="relation">
+              <caption>ticket(venue, seat, show_date, holder)</caption>
+              <thead><tr><th scope="col"></th><th scope="col">venue</th><th scope="col">seat</th><th scope="col">show_date</th><th scope="col">holder</th></tr></thead>
+              <tbody>
+                <tr><td class="empty" colspan="5">（沒有任何 tuple）</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>要推翻一條 functional dependency，需要一對在左邊相同、右邊不同的 tuple。空的 instance 和只有一列的 instance 都湊不出這樣一對，所以它們 satisfy <em>每一條</em> functional dependency，連 <span class="math">holder → seat</span> 這種明顯不合理的也算。</p>
+          <p>這說明了為什麼檢查資料只能用來推翻：資料越少，被 satisfy 的規則就越多，但這些規則不見得 hold。</p>
+        </div>
+        <p>右邊是左邊子集的 functional dependency，例如 <span class="math">{venue, seat} → venue</span>，在任何 instance 都自動 satisfy，有自己的名字：<a href="trivial-functional-dependency.html">trivial functional dependency</a>。</p>
+      </section>
+
+      <section class="step" id="summary">
+        <h2>重點整理</h2>
+        <dl class="summary">
+          <div><dt>問題 Problem</dt><dd>「同一間店只有一個電話」這種現實規則需要精確的寫法，才能檢查資料，之後再拿來重新設計 relation。</dd></div>
+          <div><dt>核心 Key idea</dt><dd>α → β：任兩個 tuple 在 α 上相同，就必須在 β 上相同；satisfy 看一份 instance，holds 看每一個 legal instance。</dd></div>
+          <div><dt>來自 Built from</dt><dd>superkey：兩個 tuple 在 K 上相同，就在整個 R 上相同。</dd></div>
+          <div><dt>差別 Difference</dt><dd>右邊不必是整個 R，可以是任何一組 attribute；superkey 只是 K → R 這個特例。</dd></div>
+        </dl>
+      </section>
+
+      <section class="step" id="exam-link">
+        <h2>考試怎麼考</h2>
+        <p>第一種題型給一份 instance，問它 satisfy 哪些 functional dependency。做法是對每條規則找「左邊相同、右邊不同」的一對 tuple。<span class="basis general">一般經驗</span></p>
+        <p>第二種題型給一組在 R 上 holds 的 functional dependency，接著問 superkey、拆表，或是否符合 BCNF（之後的正規化形式，規劃中頁面）。這一章後面的內容都以它為輸入。<span class="basis course">課程依據：Ch.7</span></p>
+        <p>最常錯的一步是看到 instance satisfy 某條規則，就寫「holds」。instance 只能推翻，不能證明。<span class="basis general">一般經驗</span></p>
+        <p>第二常錯的是把方向弄反：<span class="math">shop → shop_phone</span> holds，不代表 <span class="math">shop_phone → shop</span> 也 holds。<span class="basis general">一般經驗</span></p>
+      </section>
+
+      <section class="step" id="check">
+        <h2>自我檢測</h2>
+        <p>停車場的進場紀錄，每一列代表一次停車。</p>
+        <div class="table-wrap">
+          <table class="relation">
+            <caption>parking(plate, slot, floor, entry_time)</caption>
+            <thead><tr><th scope="col"></th><th scope="col">plate</th><th scope="col">slot</th><th scope="col">floor</th><th scope="col">entry_time</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">t₁</th><td>AAA-1001</td><td>A01</td><td>B1</td><td>08:10</td></tr>
+              <tr><th scope="row">t₂</th><td>BBB-2002</td><td>B07</td><td>B2</td><td>08:25</td></tr>
+              <tr><th scope="row">t₃</th><td>CCC-3003</td><td>A01</td><td>B1</td><td>09:40</td></tr>
+              <tr><th scope="row">t₄</th><td>DDD-4004</td><td>B12</td><td>B2</td><td>10:05</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ol>
+          <li>這份 instance satisfy <span class="math">slot → floor</span> 嗎？</li>
+          <li>這份 instance satisfy <span class="math">floor → slot</span> 嗎？不 satisfy 的話，指出是哪一對 tuple。</li>
+          <li>這份 instance satisfy <span class="math">plate → slot</span>。能不能因此說它在 parking 上 holds？</li>
+        </ol>
+        <details class="answer">
+          <summary>看答案</summary>
+          <ol>
+            <li>satisfy。slot 相同的只有 t₁ 和 t₃（都是 A01），它們的 floor 都是 B1。</li>
+            <li>不 satisfy。t₂ 和 t₄ 的 floor 都是 B2，slot 卻是 B07 和 B12。（t₁ 和 t₃ 在 B1 上沒有問題，但一對反例就夠了。）</li>
+            <li>不能。四列的 plate 都不同，所以根本沒有一對要比，satisfy 是白來的。而且每一列是一次停車，同一台車改天再來停到別的格子完全合法，所以它在現實裡也不 hold。</li>
+          </ol>
+          <p>最容易錯的是第 3 題：把「這份資料沒有反例」當成「規則成立」。避免的方法是先問「這條規則是現實規定的嗎？」，再看資料。第 2 題則要小心方向：第 1 題成立，不代表反過來也成立。</p>
+        </details>
+      </section>
+
+      <nav class="pager"></nav>
+    </main>
+  </div>
+  <footer class="site-footer">說明與例子皆為原創；<a href="../CLAUDE.md">撰寫規則</a></footer>
+</body>
+</html>

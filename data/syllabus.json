@@ -1,0 +1,13 @@
+{
+  "exam": "期中考",
+  "note": "課本投影片及相關補充教材；Web Application 不在筆試範圍",
+  "slides_url": "https://www.db-book.com/slides-dir/index.html",
+  "slide_numbering": "Slide numbers are the numbers printed in each slide's footer (ch3 slide 26 = 3.26), not PDF page numbers.",
+  "chapters": [
+    { "id": "ch2", "title": "Introduction to the Relational Model", "slides": "3–21" },
+    { "id": "ch3", "title": "Introduction to SQL", "slides": "6–28, 30–33, 49" },
+    { "id": "ch4", "title": "Intermediate SQL", "slides": "3–21, 34–42" },
+    { "id": "ch6", "title": "Database Design Using the E-R Model", "slides": "9–17, 21–31, 35–37, 45–51" },
+    { "id": "ch7", "title": "Relational Database Design", "slides": "3–32, 36–54, 62–64, 68, 70–72" }
+  ]
+}
